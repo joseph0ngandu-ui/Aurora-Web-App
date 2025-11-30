@@ -1,6 +1,7 @@
 // API Client for Aurora Backend
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://windowsserver.taildbc5d3.ts.net';
-const ENABLE_WEBSOCKET = process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET !== 'false';
+// Use local API routes which proxy to the backend server
+const API_BASE = '/api';
+const ENABLE_WEBSOCKET = false; // WebSocket not supported through proxy
 
 export interface BotStatus {
     is_running: boolean;
@@ -109,7 +110,7 @@ class AuroraAPI {
 
         try {
             const token = this.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
-            
+
             // Convert API_BASE to WebSocket URL
             const wsUrl = API_BASE.replace(/^https?:\/\//, 'wss://').replace(/^http:\/\//, 'ws://');
             const ws = new WebSocket(`${wsUrl}/ws/updates/${token}`);
