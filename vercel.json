@@ -1,8 +1,9 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "buildCommand": "cd aurora-web && npm run build",
-    "devCommand": "cd aurora-web && npm run dev",
-    "installCommand": "cd aurora-web && npm install",
+    "rootDirectory": "aurora-web",
+    "buildCommand": "npm run build",
+    "devCommand": "npm run dev",
+    "installCommand": "npm install",
     "framework": "nextjs",
-    "outputDirectory": "aurora-web/.next"
+    "outputDirectory": ".next"
 }
