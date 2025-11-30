@@ -1,6 +1,6 @@
 # Aurora Trading Dashboard
 
-Real-time ML-powered trading bot monitoring dashboard built with Next.js 14.
+Real-time ML-powered trading bot monitoring dashboard built with Next.js 15.
 
 ## Features
 
@@ -50,7 +50,7 @@ npm start
 
 3. **Configure Environment Variables**
    In Vercel dashboard, add:
-   - `NEXT_PUBLIC_API_URL` - Your backend API URL (e.g., `https://your-backend.com`)
+   - `NEXT_PUBLIC_API_URL` - Your backend API URL (e.g., `https://windowsserver.taildbc5d3.ts.net`)
    - `NEXT_PUBLIC_ENABLE_WEBSOCKET` - Set to `false` (WebSockets don't work on Vercel)
 
 4. **Deploy**
@@ -61,7 +61,7 @@ npm start
 
 ## Architecture
 
-- **Next.js 14**: App Router for optimal performance
+- **Next.js 15**: App Router for optimal performance
 - **TypeScript**: Full type safety
 - **Tailwind CSS**: Utility-first styling with custom design system
 - **WebSocket**: Real-time bot status updates (optional)
