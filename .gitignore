@@ -1,0 +1,113 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest cache
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual env
+.venv/
+venv/
+
+# Reports (keep JSON summaries; allow CSV optional)
+# Uncomment to ignore CSVs if desired
+# reports/*.csv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.joblib
+
+# Virtual env and build artifacts
+.venv/
+build/
+dist/
+*.spec
+
+# Test & tooling caches
+.pytest_cache/
+.eggs/
+*.egg-info/
+
+data/cache/
+logs/
+!logs/aws/README.md
+results/
+examples/results/
+models/*.joblib
+models/strategies_db/
+
+# IDE/editor
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Executable files (too large for GitHub)
+*.exe
+*.zip
+
+# Data and cache directories
+data/
+cache/
+outputs/
+logs/
+models/
+secrets/
+
+# Local DB and certs (do not commit)
+backend/eden_trading.db
+backend/ssl/*.pem
+backend/ssl/*.pfx
+
+# Model artifacts
+*.ckpt
+*.onnx
+*.pth
+*.h5
+*.pkl
+*.joblib
+
+# Environment and secrets
+.env
+.env.local
+.env.production
+api_keys.encrypted
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Archive folders
+**/archive/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# iOS build artifacts
+EdenIOSApp/**/Build/
+EdenIOSApp/**/DerivedData/
+
+# Temp
+openapi.json
+
+# Log files
+*.log
+
+# Debug/output text files
+bot_*.txt
+*_output.txt
+*_debug.txt
+
+# API logs
+backend/api.log
