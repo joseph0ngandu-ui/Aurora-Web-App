@@ -4,7 +4,7 @@ Real-time ML-powered trading bot monitoring dashboard built with Next.js 14.
 
 ## Features
 
-- **Real-time Updates**: WebSocket connection for live bot  status
+- **Real-time Updates**: WebSocket connection for live bot status (optional for Vercel)
 - **120fps Performance**: Optimized animations using CSS transforms and hardware acceleration
 - **ML Integration**: Monitors ML Risk Manager decisions
 - **Responsive Design**: Works on desktop, tablet, and mobile
@@ -15,8 +15,8 @@ Real-time ML-powered trading bot monitoring dashboard built with Next.js 14.
 # Install dependencies
 npm install
 
-# Create .env.local (copy from .env.example)
-cp .env.example .env.local
+# Create .env.local (copy from .env.local.example)
+cp .env.local.example .env.local
 
 # Update NEXT_PUBLIC_API_URL in .env.local if needed
 
@@ -30,20 +30,42 @@ npm start
 
 ## Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/joseph0ngandu-ui/Aurora-Web-App)
+### Prerequisites
+- A [Vercel account](https://vercel.com)
+- Your backend API deployed and accessible via HTTPS
 
-1. Push to GitHub repository
-2. Import to Vercel
-3. Add environment variable: `NEXT_PUBLIC_API_URL`
-4. Deploy
+### Deployment Steps
+
+1. **Push to GitHub repository**
+   ```bash
+   git add .
+   git commit -m "Configure for Vercel deployment"
+   git push origin main
+   ```
+
+2. **Import to Vercel**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New Project"  
+   - Import your GitHub repository
+
+3. **Configure Environment Variables**
+   In Vercel dashboard, add:
+   - `NEXT_PUBLIC_API_URL` - Your backend API URL (e.g., `https://your-backend.com`)
+   - `NEXT_PUBLIC_ENABLE_WEBSOCKET` - Set to `false` (WebSockets don't work on Vercel)
+
+4. **Deploy**
+   - Click "Deploy"
+   - Vercel will automatically build and deploy
+
+> **Note:** WebSocket real-time updates are not supported on Vercel due to its serverless architecture. The app works perfectly without WebSockets.
 
 ## Architecture
 
 - **Next.js 14**: App Router for optimal performance
 - **TypeScript**: Full type safety
 - **Tailwind CSS**: Utility-first styling with custom design system
-- **WebSocket**: Real-time bot status updates
--** API Client**: Type-safe Eden backend integration
+- **WebSocket**: Real-time bot status updates (optional)
+- **API Client**: Type-safe Aurora backend integration
 
 ## Performance Optimizations
 

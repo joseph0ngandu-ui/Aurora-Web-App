@@ -33,13 +33,19 @@ export default function DashboardPage() {
 
         // Connect WebSocket for real-time updates
         try {
-            wsRef.current = api.connectWebSocket((data) => {
+            const ws = api.connectWebSocket((data) => {
                 if (data.type === 'bot_status_update') {
                     setStatus(data.status)
                 } else if (data.type === 'new_trade') {
                     setTrades((prev) => [data.trade, ...prev].slice(0, 50))
                 }
             })
+
+            if (ws) {
+                wsRef.current = ws
+            } else {
+                console.log('WebSocket not available, real-time updates disabled')
+            }
         } catch (error) {
             console.error('WebSocket connection failed:', error)
         }
@@ -70,8 +76,8 @@ export default function DashboardPage() {
                         <button
                             onClick={() => status?.is_running ? api.stopBot() : api.startBot()}
                             className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 ${status?.is_running
-                                    ? 'bg-aurora-error text-white'
-                                    : 'bg-aurora-success text-white'
+                                ? 'bg-aurora-error text-white'
+                                : 'bg-aurora-success text-white'
                                 }`}
                         >
                             {status?.is_running ? 'Stop Bot' : 'Start Bot'}

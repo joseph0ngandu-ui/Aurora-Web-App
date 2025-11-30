@@ -1,5 +1,6 @@
-// API Client for Eden Backend
+// API Client for Aurora Backend
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8443';
+const ENABLE_WEBSOCKET = process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET !== 'false';
 
 export interface BotStatus {
     is_running: boolean;
@@ -29,40 +30,53 @@ export interface PerformanceStats {
     total_trades: number;
 }
 
-class EdenAPI {
+class AuroraAPI {
     private token: string | null = null;
 
     async login(email: string, password: string) {
-        const res = await fetch(`${API_BASE}/auth/login-local`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        });
+        try {
+            const res = await fetch(`${API_BASE}/auth/login-local`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
 
-        if (!res.ok) throw new Error('Login failed');
+            if (!res.ok) throw new Error('Login failed');
 
-        const data = await res.json();
-        this.token = data.access_token;
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('token', data.access_token);
+            const data = await res.json();
+            this.token = data.access_token;
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('token', data.access_token);
+            }
+            return data;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
         }
-        return data;
     }
 
     private async authFetch(endpoint: string, options: RequestInit = {}) {
         const token = this.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
 
-        const res = await fetch(`${API_BASE}${endpoint}`, {
-            ...options,
-            headers: {
-                ...options.headers,
-                ...(token && { 'Authorization': `Bearer ${token}` }),
-                'Content-Type': 'application/json',
-            },
-        });
+        try {
+            const res = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    ...(token && { 'Authorization': `Bearer ${token}` }),
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-        return res.json();
+            if (!res.ok) {
+                console.error(`API error: ${res.status} for ${endpoint}`);
+                throw new Error(`API error: ${res.status}`);
+            }
+            return res.json();
+        } catch (error) {
+            console.error(`Failed to fetch ${endpoint}:`, error);
+            throw error;
+        }
     }
 
     async getBotStatus(): Promise<BotStatus> {
@@ -86,17 +100,43 @@ class EdenAPI {
     }
 
     // WebSocket for real-time updates
-    connectWebSocket(onMessage: (data: any) => void) {
-        const token = this.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
-        const ws = new WebSocket(`wss://localhost:8443/ws/updates/${token}`);
+    // Note: WebSocket may not work on Vercel due to serverless limitations
+    connectWebSocket(onMessage: (data: any) => void): WebSocket | null {
+        if (!ENABLE_WEBSOCKET) {
+            console.warn('WebSocket disabled in environment');
+            return null;
+        }
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            onMessage(data);
-        };
+        try {
+            const token = this.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
+            
+            // Convert API_BASE to WebSocket URL
+            const wsUrl = API_BASE.replace(/^https?:\/\//, 'wss://').replace(/^http:\/\//, 'ws://');
+            const ws = new WebSocket(`${wsUrl}/ws/updates/${token}`);
 
-        return ws;
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    onMessage(data);
+                } catch (error) {
+                    console.error('WebSocket message parse error:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection closed');
+            };
+
+            return ws;
+        } catch (error) {
+            console.error('WebSocket connection failed:', error);
+            return null;
+        }
     }
 }
 
-export const api = new EdenAPI();
+export const api = new AuroraAPI();
