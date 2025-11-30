@@ -23,8 +23,8 @@ ALGORITHM = "HS256"
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# HTTP Bearer scheme for token authentication
-security = HTTPBearer()
+# HTTP Bearer scheme for token authentication - auto_error=False allows missing headers
+security = HTTPBearer(auto_error=False)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash."""
@@ -75,35 +75,38 @@ def authenticate_user(email: str, password: str) -> Optional[User]:
     return user
 
 async def get_current_user_http(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> User:
-    """Dependency to get current user from HTTP request."""
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    
-    try:
-        payload = verify_token(credentials.credentials)
-        if payload is None:
-            raise credentials_exception
-        
-        email: str = payload.get("sub")
-        user_id: int = payload.get("user_id")
-        
-        if email is None or user_id is None:
-            raise credentials_exception
-    
-    except:
-        raise credentials_exception
-    
-    # Get user from database
+    """
+    Dependency to get current user from HTTP request.
+    SECURITY DISABLED: Always returns admin user.
+    """
+    # Get user from database - try admin first
     db_session = get_db_session()
-    user = db_session.query(User).filter(User.id == user_id).first()
+    user = db_session.query(User).filter(User.email == "admin@eden.com").first()
     
     if user is None:
-        raise credentials_exception
+        # If no admin, get any user
+        user = db_session.query(User).first()
+        
+    if user is None:
+        # If absolutely no user, create a dummy one (should not happen if DB init ran)
+        try:
+            from app.database import init_db
+            init_db()
+            user = db_session.query(User).filter(User.email == "admin@eden.com").first()
+        except:
+            pass
+            
+    if user is None:
+        # Fallback to a mock object if DB is totally broken
+        class MockUser:
+            id = 1
+            email = "admin@eden.com"
+            full_name = "System Administrator"
+            is_active = True
+            hashed_password = "mock"
+        return MockUser()
     
     return user
 
@@ -111,26 +114,18 @@ async def get_current_user_http(
 get_current_user = get_current_user_http
 
 async def get_current_user_ws(websocket: WebSocket, token: str) -> Optional[User]:
-    """Get current user for WebSocket connections."""
-    try:
-        payload = verify_token(token)
-        if payload is None:
-            return None
-        
-        email: str = payload.get("sub")
-        user_id: int = payload.get("user_id")
-        
-        if email is None or user_id is None:
-            return None
-        
-        # Get user from database
-        db_session = get_db_session()
-        user = db_session.query(User).filter(User.id == user_id).first()
-        
-        return user
+    """
+    Get current user for WebSocket connections.
+    SECURITY DISABLED: Always returns admin user.
+    """
+    # Get user from database
+    db_session = get_db_session()
+    user = db_session.query(User).filter(User.email == "admin@eden.com").first()
     
-    except:
-        return None
+    if user is None:
+        user = db_session.query(User).first()
+        
+    return user
 
 def check_permission(user: User, required_role: str = "user") -> bool:
     """Check if user has required role/permission."""

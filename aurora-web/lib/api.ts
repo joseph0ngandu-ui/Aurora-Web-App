@@ -1,5 +1,12 @@
 // API Client for Eden Backend
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8443';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
+export interface APIResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
+    timestamp: string;
+}
 
 export interface BotStatus {
     is_running: boolean;
@@ -32,11 +39,16 @@ export interface PerformanceStats {
 class EdenAPI {
     private token: string | null = null;
 
-    async login(email: string, password: string) {
-        const res = await fetch(`${API_BASE}/auth/login-local`, {
+    async login(username: string, password: string) {
+        // OAuth2 standard form data
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        const res = await fetch(`${API_BASE}/auth/login/access-token`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData,
         });
 
         if (!res.ok) throw new Error('Login failed');
@@ -49,7 +61,7 @@ class EdenAPI {
         return data;
     }
 
-    private async authFetch(endpoint: string, options: RequestInit = {}) {
+    private async authFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
         const token = this.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
 
         const res = await fetch(`${API_BASE}${endpoint}`, {
@@ -62,33 +74,41 @@ class EdenAPI {
         });
 
         if (!res.ok) throw new Error(`API error: ${res.status}`);
-        return res.json();
+        const json: APIResponse<T> = await res.json();
+
+        // Unwrap the standard response wrapper
+        if (json.success === false) {
+            throw new Error(json.message || 'API operation failed');
+        }
+        return json.data;
     }
 
     async getBotStatus(): Promise<BotStatus> {
-        return this.authFetch('/bot/status');
+        return this.authFetch<BotStatus>('/bot/status');
     }
 
     async getTradeHistory(limit = 100): Promise<Trade[]> {
-        return this.authFetch(`/trades/history?limit=${limit}`);
+        return this.authFetch<Trade[]>(`/trades/history?limit=${limit}`);
     }
 
     async getPerformanceStats(): Promise<PerformanceStats> {
-        return this.authFetch('/performance/stats');
+        return this.authFetch<PerformanceStats>('/performance/stats');
     }
 
     async startBot() {
-        return this.authFetch('/bot/start', { method: 'POST' });
+        return this.authFetch<string>('/bot/start', { method: 'POST' });
     }
 
     async stopBot() {
-        return this.authFetch('/bot/stop', { method: 'POST' });
+        return this.authFetch<string>('/bot/stop', { method: 'POST' });
     }
 
     // WebSocket for real-time updates
     connectWebSocket(onMessage: (data: any) => void) {
         const token = this.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
-        const ws = new WebSocket(`wss://localhost:8443/ws/updates/${token}`);
+        // Use ws:// for localhost:8000 (HTTP)
+        const wsUrl = API_BASE.replace('http', 'ws').replace('/api/v1', '');
+        const ws = new WebSocket(`${wsUrl}/api/v1/ws/updates/${token}`);
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);

@@ -44,6 +44,7 @@ from app.websocket_manager import WebSocketManager
 from app.database import Base, engine
 from app.routers import strategies as strategies_router
 from app import aws_bridge as aws_bridge_router
+from app.core.config import settings
 
 # Load environment variables
 load_dotenv()
@@ -54,33 +55,42 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Eden Trading Bot API",
-    description="REST API for Eden iOS trading application",
-    version="1.0.0"
+    title=settings.PROJECT_NAME,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    description="REST API for Eden Trading Bot",
+    version="2.0.0"
 )
 
-# Add CORS middleware for AWS API Gateway compatibility
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Set all CORS enabled origins
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # Default to allow all for development if not specified
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Initialize services
 trading_service = TradingService()
 ws_manager = WebSocketManager()
 
-# Routers
-app.include_router(strategies_router.router)
-app.include_router(aws_bridge_router.router)
+# Include New API Router
+from app.api.v1.api import api_router
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
-# Strategy service (lazy import to avoid heavy deps at import time)
-try:
-    from ml_strategy_generator import MLStrategyGenerator
-except Exception:
-    MLStrategyGenerator = None
+# Legacy Routers (Deprecated - to be migrated)
+# app.include_router(strategies_router.router)
+# app.include_router(aws_bridge_router.router)
 
 # Initialize database on startup
 @app.on_event("startup")
@@ -90,48 +100,7 @@ async def startup():
     Base.metadata.create_all(bind=engine)
     init_db()
     logger.info("✓ Database initialized")
-
-    # Start background strategy discovery loop (non-blocking)
-    if MLStrategyGenerator is not None:
-        import asyncio
-        generator = MLStrategyGenerator(data_dir=str((Path(__file__).resolve().parent.parent / 'data').resolve()))
-
-        async def strategy_loop():
-            while True:
-                try:
-                    # Discovery cycle
-                    strat = generator.generate_and_test_strategy()
-                    if strat and ws_manager:
-                        await ws_manager.broadcast_json({
-                            "type": "strategy_discovered",
-                            "strategy": {
-                                "id": strat.id,
-                                "name": strat.name,
-                                "type": strat.type,
-                                "parameters": strat.parameters,
-                                "performance": strat.backtest_results,
-                                "validated": strat.is_validated,
-                                "active": strat.is_active,
-                            }
-                        })
-
-                    # Phase-out cycle
-                    phased = generator.phase_out_strategies()
-                    for sid, reason in phased.items():
-                        await ws_manager.broadcast_json({
-                            "type": "strategy_phased_out",
-                            "strategy_id": sid,
-                            "reason": reason,
-                        })
-                except Exception as e:
-                    logger.error(f"Strategy discovery error: {e}")
-                # Sleep 10 minutes between cycles
-                await asyncio.sleep(600)
-
-        asyncio.create_task(strategy_loop())
-        logger.info("✓ Strategy discovery loop started")
-
-    logger.info("✓ Eden API ready for deployment")
+    logger.info(f"✓ Eden API v2 ready at {settings.API_V1_STR}")
 
 # ============================================================================
 # HEALTH ENDPOINT
