@@ -87,20 +87,20 @@ After deployment:
 ### 1. Check the Deployed App
 Visit: https://aurora-web-app-seven.vercel.app
 
-### 2. Open Browser DevTools (F12)
+### 2. Login
+- The app will automatically redirect you to `/login` if you are not authenticated.
+- Enter your email and password.
+- Upon successful login, you will be redirected to the dashboard.
+
+### 3. Open Browser DevTools (F12)
 - Go to **Network** tab
 - Refresh the page
 - You should see requests to `/api/bot/status`, `/api/trades/recent`, etc.
-- These should return **200 OK** or **401 Unauthorized** (not 404)
+- These should return **200 OK** (after login)
 
-### 3. Check Console
+### 4. Check Console
 - No more `localhost:8443` errors
 - API calls go to `/api/*` routes
-
-### 4. Test Login
-- Try logging in with your credentials
-- Should successfully authenticate
-- Dashboard should load with real data
 
 ---
 
