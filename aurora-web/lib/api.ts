@@ -1,5 +1,5 @@
 // API Client for Aurora Backend
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8443';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://windowsserver.taildbc5d3.ts.net';
 const ENABLE_WEBSOCKET = process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET !== 'false';
 
 export interface BotStatus {
