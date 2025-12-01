@@ -1,6 +1,6 @@
 # Eden Trading Bot API Endpoints
 
-**Base URL**: `https://desktop-p1p7892.taildbc5d3.ts.net`
+**Base URL**: `https://windowsserver.taildbc5d3.ts.net`
 
 ## Authentication Endpoints
 
@@ -173,7 +173,7 @@ Authorization: Bearer {access_token}
 ## WebSocket Endpoint
 
 ```
-wss://desktop-p1p7892.taildbc5d3.ts.net/ws/notifications
+wss://windowsserver.taildbc5d3.ts.net/ws/notifications
 ```
 
 ---
@@ -192,7 +192,7 @@ wss://desktop-p1p7892.taildbc5d3.ts.net/ws/notifications
 
 Test connectivity:
 ```bash
-curl https://desktop-p1p7892.taildbc5d3.ts.net/health
+curl https://windowsserver.taildbc5d3.ts.net/health
 ```
 
 Expected response:

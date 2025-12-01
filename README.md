@@ -1,215 +1,277 @@
-# Eden Trading Bot
+# Aurora Web App
 
-A professional algorithmic trading system built with Python and MetaTrader 5, featuring advanced ICT (Inner Circle Trader) strategies, real-time market analysis, and autonomous optimization capabilities.
+A modern Next.js web application for real-time trading bot monitoring with ML-powered analytics.
 
-## 🚀 Features
+![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38bdf8?logo=tailwindcss)
 
-- **Advanced Trading Strategies**
-  - Volatility Burst v1.3 with enhanced entry/exit logic
-  - ICT 2023 Silver Bullet Strategy
-  - ICT 2024 Unicorn Model
-  - ICT 2025 Venom Strategy
-  
-- **Backend API (FastAPI)**
-  - RESTful API with comprehensive endpoints
-  - WebSocket support for real-time updates
-  - JWT authentication
-  - Systematic status monitoring
-  
-- **Autonomous Optimization**
-  - Real-time parameter tuning
-  - Performance-based adjustments
-  - Risk management optimization
-  
-- **Professional Infrastructure**
-  - Health monitoring and watchdog systems
-  - Comprehensive logging and error tracking
-  - Trade journaling and performance analytics
-  - SSL/HTTPS support
+## ✨ Features
 
-## 📋 Prerequisites
+- **Real-time Dashboard** - Monitor bot status, trades, and performance metrics
+- **120fps Animations** - Silky smooth UI with hardware-accelerated transitions
+- **Responsive Design** - Works beautifully on desktop, tablet, and mobile
+- **Type-Safe API** - Full TypeScript integration with backend
+- **Dark Mode** - Optimized for extended trading sessions
 
-- Python 3.10+
-- MetaTrader 5 terminal
-- Windows OS (for MT5 integration)
-- Active MT5 account (demo or live)
+## 🚀 Deploy to Vercel
 
-## 🛠️ Installation
+### Step 1: Fork/Clone Repository
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/Eden.git
-   cd Eden
-   ```
-
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Configure environment**
-   - Copy `.env.example` to `.env`
-   - Update with your MT5 credentials and settings
-   ```env
-   MT5_LOGIN=your_account
-   MT5_PASSWORD=your_password
-   MT5_SERVER=your_broker_server
-   ```
-
-4. **Configure strategies**
-   - Edit `data/strategies.json` to enable/configure strategies
-   - Adjust risk parameters in `config/risk_config.json`
-
-## 🎯 Quick Start
-
-### Start the Backend API
 ```bash
-cd backend
-python main.py
-```
-The API will be available at `https://localhost:8443`
-
-### Run the Trading Bot
-```bash
-python infrastructure/bot_runner.py
+git clone https://github.com/YOUR_USERNAME/Aurora-Web-App.git
+cd Aurora-Web-App
 ```
 
-### Complete System Restart
-```powershell
-.\restart_all.ps1
+### Step 2: Push to Your GitHub
+
+```bash
+git remote set-url origin https://github.com/YOUR_USERNAME/Aurora-Web-App.git
+git push -u origin main
+```
+
+### Step 3: Import to Vercel
+
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Click **"Import Git Repository"**
+3. Select your `Aurora-Web-App` repository
+4. Vercel will auto-detect the Next.js framework ✅
+
+### Step 4: Configure Environment Variables
+
+Before deploying, add these environment variables in Vercel:
+
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `NEXT_PUBLIC_API_URL` | `https://your-backend-url.com` | Your deployed backend API URL |
+| `NEXT_PUBLIC_ENABLE_WEBSOCKET` | `false` | Disable WebSocket on Vercel (serverless limitation) |
+
+**To add variables:**
+1. In Vercel import screen, click **"Environment Variables"**
+2. Add both variables above
+3. Set for **Production**, **Preview**, and **Development** environments
+
+### Step 5: Deploy! 🎉
+
+1. Click **"Deploy"**
+2. Wait 2-3 minutes for build to complete
+3. Your app will be live at `https://your-app.vercel.app`
+
+## 🔧 Local Development
+
+If you want to run the app locally:
+
+```bash
+# Navigate to web app directory
+cd aurora-web
+
+# Install dependencies
+npm install
+
+# Create local environment file
+cp .env.local.example .env.local
+
+# Edit .env.local and set your backend URL
+# NEXT_PUBLIC_API_URL=https://your-backend-url.com
+
+# Run development server
+npm run dev
+
+# Open http://localhost:3000
 ```
 
 ## 📁 Project Structure
 
 ```
-Eden/
-├── backend/              # FastAPI backend server
-│   ├── app/             # API application
-│   │   ├── routers/     # API endpoints
-│   │   ├── models.py    # Pydantic models
-│   │   └── ...
-│   └── main.py          # API entry point
-├── trading/             # Trading bot core
-│   ├── trading_bot.py   # Main bot logic
-│   ├── ict_strategies.py # ICT strategy implementations
-│   ├── volatility_burst_enhanced.py
-│   ├── models.py        # Shared trading models
-│   └── ...
-├── infrastructure/      # System infrastructure
-│   ├── bot_runner.py    # Bot execution wrapper
-│   └── ...
-├── config/              # Configuration files
-├── data/                # Strategy configs and data
-├── scripts/             # Utility scripts
-│   └── debug/          # Debug and verification tools
-├── tests/               # Unit and integration tests
-└── docs/                # Additional documentation
+Aurora-Web-App/
+├── aurora-web/              # Next.js application
+│   ├── app/                # App router pages
+│   │   ├── page.tsx       # Main dashboard
+│   │   ├── layout.tsx     # Root layout
+│   │   └── globals.css    # Global styles
+│   ├── lib/               # Utilities
+│   │   └── api.ts         # Backend API client
+│   ├── package.json       # Dependencies
+│   ├── next.config.js     # Next.js config
+│   ├── tailwind.config.js # Tailwind config
+│   └── tsconfig.json      # TypeScript config
+├── API_ENDPOINTS.md       # Backend API documentation
+├── vercel.json            # Vercel configuration
+└── README.md              # This file
 ```
 
-## 🔌 API Documentation
+## 🔌 Backend API
 
-See [API_ENDPOINTS.md](API_ENDPOINTS.md) for complete API documentation.
+This web app connects to a separately deployed FastAPI backend.
 
-Key endpoints:
-- `GET /health` - System health status
-- `GET /strategies` - List all strategies
-- `GET /trades` - Trade history
-- `GET /performance` - Performance metrics
-- `WebSocket /ws` - Real-time updates
+**Backend URL**: `https://desktop-p1p7892.taildbc5d3.ts.net`
 
-## 📊 Trading Strategies
+**Important**: Set this URL as `NEXT_PUBLIC_API_URL` in your Vercel environment variables.
 
-### Volatility Burst v1.3
-High-frequency strategy that identifies and exploits sudden volatility spikes with precise entry and exit logic.
+### Complete API Endpoints
 
-### ICT Silver Bullet (2023)
-Trades specific killzone timeframes (2-5 AM / 10-11 AM NY) targeting liquidity sweeps and fair value gaps.
+#### Authentication (No Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register-local` | Register new user |
+| POST | `/auth/login-local` | Login user |
+| GET | `/health` | Health check |
+| GET | `/info` | API information |
 
-### ICT Unicorn Model (2024)
-Advanced pattern recognition for high-probability setups using orderblock validation and liquidity analysis.
+#### Bot Control (Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/bot/status` | Get bot status and metrics |
+| POST | `/bot/start` | Start trading bot |
+| POST | `/bot/stop` | Stop trading bot |
+| POST | `/bot/pause` | Pause trading bot |
 
-### ICT Venom (2025)
-Cutting-edge multi-timeframe strategy combining all ICT concepts for maximum accuracy.
+#### Trading (Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/trades/open` | Get open positions |
+| GET | `/trades/history` | Get trade history |
+| GET | `/trades/recent` | Get recent trades |
+| GET | `/trades/logs` | Get trade logs |
+| POST | `/trades/close` | Close a position |
 
-## 🔧 Configuration
+#### Performance (Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/performance/stats` | Performance statistics |
+| GET | `/performance/equity-curve` | Equity curve data |
+| GET | `/performance/daily-summary` | Daily summary |
 
-### Risk Management
-Edit `config/risk_config.json`:
-```json
-{
-  "max_risk_per_trade": 0.02,
-  "max_daily_drawdown": 0.05,
-  "position_sizing": "dynamic"
+#### Account Management (Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/account/mt5` | List all MT5 accounts |
+| GET | `/account/mt5/primary` | Get primary MT5 account |
+| POST | `/account/mt5` | Create MT5 account |
+| PUT | `/account/mt5/{id}` | Update MT5 account |
+| DELETE | `/account/mt5/{id}` | Delete MT5 account |
+
+#### Strategies (Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/strategy/config` | Get strategy config |
+| POST | `/strategy/config` | Update strategy config |
+| GET | `/strategy/symbols` | Get available symbols |
+| GET | `/strategies` | List all strategies |
+| POST | `/strategies` | Upload new strategy |
+| GET | `/strategies/validated` | List validated strategies |
+| GET | `/strategies/active` | List active strategies |
+| PUT | `/strategies/{id}/activate` | Activate a strategy |
+| PUT | `/strategies/{id}/deactivate` | Deactivate a strategy |
+| PUT | `/strategies/{id}/promote` | Promote strategy to LIVE mode |
+| PATCH | `/strategies/{id}/policy` | Update strategy policy |
+
+#### System (Auth Required)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/system/status` | System status |
+| POST | `/device/register` | Register device for push notifications |
+| POST | `/orders/test` | Place test order |
+
+### Authentication
+
+All authenticated endpoints require a JWT token in the header:
+
+```
+Authorization: Bearer {access_token}
+```
+
+Get your token by logging in via `/auth/login-local`.
+
+### WebSocket Support
+
+```
+wss://desktop-p1p7892.taildbc5d3.ts.net/ws/notifications
+```
+
+**Note**: WebSocket is disabled on Vercel deployments (`NEXT_PUBLIC_ENABLE_WEBSOCKET=false`)
+
+## 🌐 Deployed Website
+
+Once deployed to Vercel, your website will be available at:
+
+```
+https://your-project-name.vercel.app
+```
+
+**Example**: `https://aurora-trading-dashboard.vercel.app`
+
+You can customize the domain in Vercel's project settings or add a custom domain.
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+Create `.env.local` in the `aurora-web/` directory:
+
+```env
+# Backend API URL (required)
+NEXT_PUBLIC_API_URL=https://your-backend-url.com
+
+# Enable WebSocket for real-time updates (optional)
+# Set to false on Vercel due to serverless limitations
+NEXT_PUBLIC_ENABLE_WEBSOCKET=false
+```
+
+### Vercel Settings
+
+The `vercel.json` file is pre-configured to:
+- Build from the `aurora-web/` directory
+- Use Next.js framework detection
+- Output to `.next` directory
+
+## 🎨 Customization
+
+### Colors
+
+Edit `aurora-web/app/globals.css` to customize the theme:
+
+```css
+:root {
+  --aurora-blue: #4A90E2;
+  --aurora-background: #0A0E27;
+  --aurora-surface: #141B3D;
+  /* ... more colors */
 }
 ```
 
-### Strategy Selection
-Edit `data/strategies.json` to enable/disable strategies:
-```json
-{
-  "strategies": [
-    {
-      "name": "Volatility Burst v1.3",
-      "enabled": true,
-      "version": "1.3.0"
-    }
-  ]
-}
-```
+### API Client
 
-## 🧪 Testing
+Edit `aurora-web/lib/api.ts` to add new API endpoints or modify existing ones.
 
-Run unit tests:
-```bash
-pytest tests/
-```
+## 🐛 Troubleshooting
 
-Run specific strategy tests:
-```bash
-pytest tests/test_ict_strategies.py -v
-```
+### "Failed to load data" Error
+- Check that `NEXT_PUBLIC_API_URL` is correctly set in Vercel environment variables
+- Verify your backend is deployed and accessible
+- Check backend CORS settings allow requests from your Vercel domain
 
-## 📈 Monitoring
+### Vercel Shows Wrong Framework
+- Make sure `vercel.json` exists in repository root
+- Check that root directory is not set in Vercel project settings
+- Redeploy after adding `vercel.json`
 
-### Health Checks
-```bash
-python check_bot.ps1
-```
-
-### View Logs
-- Backend: `backend/api.log`
-- Trading: `logs/trading_*.log`
-- System: `watchdog.log`
-
-### Performance Reports
-Generated in `reports/` directory with CSV and JSON formats.
-
-## 🔐 Security
-
-- JWT-based authentication for API access
-- Environment variables for sensitive data
-- SSL/HTTPS encryption for all communications
-- No hardcoded credentials
+### WebSocket Not Working
+- WebSockets don't work on Vercel's serverless platform
+- Set `NEXT_PUBLIC_ENABLE_WEBSOCKET=false`
+- The app works perfectly with REST API polling instead
 
 ## 📝 License
 
 This project is proprietary software. All rights reserved.
 
-## 🤝 Contributing
+## 🤝 Support
 
-This is a private trading system. Contact the repository owner for collaboration inquiries.
-
-## ⚠️ Disclaimer
-
-Trading forex and CFDs involves significant risk. This software is provided for educational and research purposes. Always test strategies in a demo environment before live trading. Past performance does not guarantee future results.
-
-## 📞 Support
-
-For questions or issues:
-- Check [QUICKSTART.md](QUICKSTART.md) for setup help
-- Review [API_ENDPOINTS.md](API_ENDPOINTS.md) for API details
-- See [STRUCTURE.md](STRUCTURE.md) for architecture overview
+For issues or questions:
+- Review the [API documentation](API_ENDPOINTS.md)
+- Check Vercel deployment logs
+- Verify backend connectivity
 
 ---
 
-**Built with ❤️ for algorithmic trading excellence**
+**Built with modern web technologies** ⚡

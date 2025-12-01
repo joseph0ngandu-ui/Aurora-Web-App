@@ -3,12 +3,15 @@
 import { useEffect, useState, useRef } from 'react'
 import { api, BotStatus, Trade, PerformanceStats } from '@/lib/api'
 
+import { useRouter } from 'next/navigation'
+
 export default function DashboardPage() {
     const [status, setStatus] = useState<BotStatus | null>(null)
     const [trades, setTrades] = useState<Trade[]>([])
     const [stats, setStats] = useState<PerformanceStats | null>(null)
     const [loading, setLoading] = useState(true)
     const wsRef = useRef<WebSocket | null>(null)
+    const router = useRouter()
 
     useEffect(() => {
         // Fetch initial data
@@ -23,8 +26,12 @@ export default function DashboardPage() {
                 setTrades(tradeData)
                 setStats(statsData)
                 setLoading(false)
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to load data:', error)
+                // Check if error is 401 (Unauthorized)
+                if (error.message && error.message.includes('401')) {
+                    router.push('/login')
+                }
                 setLoading(false)
             }
         }
@@ -33,13 +40,19 @@ export default function DashboardPage() {
 
         // Connect WebSocket for real-time updates
         try {
-            wsRef.current = api.connectWebSocket((data) => {
+            const ws = api.connectWebSocket((data) => {
                 if (data.type === 'bot_status_update') {
                     setStatus(data.status)
                 } else if (data.type === 'new_trade') {
                     setTrades((prev) => [data.trade, ...prev].slice(0, 50))
                 }
             })
+
+            if (ws) {
+                wsRef.current = ws
+            } else {
+                console.log('WebSocket not available, real-time updates disabled')
+            }
         } catch (error) {
             console.error('WebSocket connection failed:', error)
         }
@@ -70,8 +83,8 @@ export default function DashboardPage() {
                         <button
                             onClick={() => status?.is_running ? api.stopBot() : api.startBot()}
                             className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 ${status?.is_running
-                                    ? 'bg-aurora-error text-white'
-                                    : 'bg-aurora-success text-white'
+                                ? 'bg-aurora-error text-white'
+                                : 'bg-aurora-success text-white'
                                 }`}
                         >
                             {status?.is_running ? 'Stop Bot' : 'Start Bot'}
